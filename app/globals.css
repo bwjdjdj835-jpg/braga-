@@ -1,7 +1,12 @@
 @tailwind base;@tailwind components;@tailwind utilities;
 body{background:radial-gradient(ellipse at top,#0b1f45,#020817 70%);color:#e0f2fe;min-height:100vh}
 .glow{box-shadow:0 0 18px rgba(56,189,248,.35);border:1px solid rgba(56,189,248,.35)}
-.panel{background:rgba(6,18,43,.75);border:1px solid rgba(56,189,248,.2);border-radius:14px;backdrop-filter:blur(6px)}
-.btn{background:linear-gradient(90deg,#0369a1,#0ea5e9);padding:.55rem 1.1rem;border-radius:10px;font-weight:600}
+.panel{background:rgba(6,18,43,.75);border:1px solid rgba(56,189,248,.2);border-radius:16px;backdrop-filter:blur(6px);box-sizing:border-box}
+.btn{background:linear-gradient(90deg,#0369a1,#0ea5e9);padding:.85rem 1.5rem;border-radius:10px;font-weight:600}
 .btn:disabled{opacity:.5}
-.inp{background:#020817;border:1px solid rgba(56,189,248,.3);border-radius:10px;padding:.55rem .8rem;width:100%;color:#e0f2fe}
+.inp{background:#020817;border:1px solid rgba(56,189,248,.3);border-radius:10px;padding:.85rem 1.1rem;width:100%;color:#e0f2fe}
+@media (max-width:640px){
+  .btn{padding:.9rem 1.25rem}
+  .inp{padding:.9rem 1rem}
+  .panel{border-radius:14px}
+}

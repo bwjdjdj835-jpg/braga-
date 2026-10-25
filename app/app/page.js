@@ -4,13 +4,13 @@ import Link from "next/link";
 import Sphere from "@/components/Sphere";
 const tools=[["chat","💬 Chat"],["ebook","📘 Gerador de e-book"],["book","📚 Gerador de livro",1],["site","🌐 Gerador de sites",1],["webapp","🧩 Gerador de web app",1],["apk","🤖 Ajuda com APK",1]];
 export default function App(){const[tool,setTool]=useState("chat");const[busy,setBusy]=useState(false);
-  return <div className="flex h-screen">
-    <aside className="w-64 panel m-3 p-4 flex flex-col gap-2 shrink-0">
-      <Link href="/" className="text-2xl font-bold tracking-widest text-jarvis-300 mb-4">BRAGA</Link>
-      {tools.map(([id,l,soon])=><button key={id} disabled={soon} onClick={()=>setTool(id)} className={`text-left px-3 py-2 rounded-lg ${tool===id?"glow bg-jarvis-700":""} ${soon?"opacity-50 cursor-not-allowed":"hover:bg-jarvis-700"}`}>{l}{soon&&<span className="ml-2 text-[10px] bg-amber-500/30 text-amber-200 px-1.5 py-0.5 rounded">em breve</span>}</button>)}
-      <div className="mt-auto flex flex-col items-center"><Sphere active={busy} size={190}/><p className="text-xs text-sky-300/70">{busy?"Processando...":"Online"}</p></div>
+  return <div className="flex flex-col md:flex-row min-h-screen gap-5 p-5 md:gap-6 md:p-6">
+    <aside className="w-full md:w-72 panel p-5 md:p-6 flex flex-col gap-4 md:gap-4 shrink-0 overflow-auto">
+      <Link href="/" className="text-2xl font-bold tracking-widest text-jarvis-300 mb-8 px-1">BRAGA</Link>
+      {tools.map(([id,l,soon])=><button key={id} disabled={soon} onClick={()=>setTool(id)} className={`text-left px-4 py-3.5 rounded-lg leading-relaxed ${tool===id?"glow bg-jarvis-700":""} ${soon?"opacity-50 cursor-not-allowed":"hover:bg-jarvis-700"}`}>{l}{soon&&<span className="block w-fit mt-2 text-[10px] leading-none bg-amber-500/30 text-amber-200 px-2.5 py-1.5 rounded">em breve</span>}</button>)}
+      <div className="mt-auto pt-10 flex flex-col items-center gap-5"><Sphere active={busy} size={170}/><p className="text-xs text-sky-300/70">{busy?"Processando...":"Online"}</p></div>
     </aside>
-    <main className="flex-1 m-3 ml-0 panel p-5 overflow-auto">{tool==="chat"?<Chat setBusy={setBusy}/>:<Ebook setBusy={setBusy}/>}</main>
+    <main className="flex-1 min-h-0 panel p-6 md:p-10 overflow-auto">{tool==="chat"?<Chat setBusy={setBusy}/>:<Ebook setBusy={setBusy}/>}</main>
   </div>}
 function Chat({setBusy}){const[msgs,setMsgs]=useState([]);const[inp,setInp]=useState("");const[load,setLoad]=useState(false);const end=useRef();
   useEffect(()=>{end.current?.scrollIntoView();},[msgs]);
@@ -18,10 +18,10 @@ function Chat({setBusy}){const[msgs,setMsgs]=useState([]);const[inp,setInp]=useS
     try{const r=await fetch("/api/chat",{method:"POST",body:JSON.stringify({messages:m})});const rd=r.body.getReader(),dec=new TextDecoder();let t="";
       for(;;){const{done,value}=await rd.read();if(done)break;t+=dec.decode(value,{stream:true});setMsgs([...m,{role:"assistant",content:t}]);}}
     catch(err){setMsgs([...m,{role:"assistant",content:"Erro: "+err.message}]);}setLoad(false);setBusy(false);}
-  return <div className="flex flex-col h-full"><h2 className="text-xl font-bold text-jarvis-300 mb-3">Chat com a Braga</h2>
-    <div className="flex-1 overflow-auto space-y-3">{msgs.length===0&&<p className="text-sky-300/60">Pergunte qualquer coisa. Eu sou direta.</p>}
-      {msgs.map((m,i)=><div key={i} className={`max-w-3xl whitespace-pre-wrap p-3 rounded-xl ${m.role==="user"?"ml-auto bg-sky-800/60":"bg-jarvis-700/60 glow"}`}>{m.content||"…"}</div>)}<div ref={end}/></div>
-    <form onSubmit={send} className="flex gap-2 mt-3"><input className="inp" value={inp} onChange={e=>setInp(e.target.value)} placeholder="Digite sua mensagem..."/><button className="btn" disabled={load}>Enviar</button></form></div>}
+  return <div className="flex flex-col h-full gap-6 md:gap-8"><h2 className="text-xl font-bold text-jarvis-300 pb-4 md:pb-5 mb-2 border-b border-sky-400/20">Chat com a Braga</h2>
+    <div className="flex-1 min-h-0 overflow-auto flex flex-col gap-5 md:gap-6 pr-2 md:pr-3 pt-3">{msgs.length===0&&<p className="text-sky-300/60 mt-2 mb-4">Pergunte qualquer coisa. Eu sou direta.</p>}
+      {msgs.map((m,i)=><div key={i} className={`max-w-[95%] md:max-w-3xl whitespace-pre-wrap leading-relaxed px-5 py-4 md:px-6 md:py-5 rounded-2xl ${m.role==="user"?"self-end bg-sky-800/60":"self-start bg-jarvis-700/60 glow"}`}>{m.content||"…"}</div>)}<div ref={end}/></div>
+    <form onSubmit={send} className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-5 md:pt-6 mt-3 border-t border-sky-400/20"><input className="inp" value={inp} onChange={e=>setInp(e.target.value)} placeholder="Digite sua mensagem..."/><button className="btn shrink-0 px-6 w-full sm:w-auto" disabled={load}>Enviar</button></form></div>}
 function drawCover(cv,b,back){const c=cv.getContext("2d"),W=cv.width,H=cv.height;const g=c.createLinearGradient(0,0,W,H);g.addColorStop(0,"#020817");g.addColorStop(.6,"#0b1f45");g.addColorStop(1,"#0369a1");c.fillStyle=g;c.fillRect(0,0,W,H);
   c.strokeStyle="rgba(125,211,252,.6)";c.lineWidth=4;c.strokeRect(30,30,W-60,H-60);for(let i=0;i<60;i++){c.fillStyle=`rgba(125,211,252,${Math.random()*.6})`;c.beginPath();c.arc(Math.random()*W,Math.random()*H,Math.random()*3,0,7);c.fill();}
   const wrap=(t,y,size,max,col)=>{c.font=`bold ${size}px sans-serif`;c.fillStyle=col;c.textAlign="center";let line="",ys=y;for(const w of t.split(" ")){if(c.measureText(line+w).width>max){c.fillText(line,W/2,ys);line="";ys+=size*1.25;}line+=w+" ";}c.fillText(line,W/2,ys);return ys;};
@@ -37,21 +37,21 @@ function Ebook({setBusy}){const[f,setF]=useState({topic:"",audience:"",chapters:
     d.addImage(front.current.toDataURL("image/png"),"PNG",0,0,W,H);let y;const np=()=>{d.addPage();y=M;};const write=(t,size,bold)=>{d.setFont("helvetica",bold?"bold":"normal");d.setFontSize(size);for(const l of d.splitTextToSize(t,W-2*M)){if(y>H-M)np();d.text(l,M,y);y+=size*1.4;}y+=size*.6;};
     np();write("Sumário",20,1);b.outline.forEach((o,i)=>write(`${i+1}. ${o}`,12));for(const c of b.chapters){np();write(c.title,18,1);write(c.content,12);}
     d.addPage();d.addImage(back.current.toDataURL("image/png"),"PNG",0,0,W,H);d.save(slug()+".pdf");}
-  return <div><h2 className="text-xl font-bold text-jarvis-300 mb-3">Gerador de e-book</h2>
-    <form onSubmit={gen} className="grid md:grid-cols-4 gap-3 mb-5">
+  return <div><h2 className="text-xl font-bold text-jarvis-300 mb-8">Gerador de e-book</h2>
+    <form onSubmit={gen} className="grid md:grid-cols-4 gap-4 mb-8">
       <input required className="inp" placeholder="Tema (ex.: finanças pessoais)" value={f.topic} onChange={e=>setF({...f,topic:e.target.value})}/>
       <input className="inp" placeholder="Público (ex.: jovens de 18 a 25)" value={f.audience} onChange={e=>setF({...f,audience:e.target.value})}/>
       <input className="inp" type="number" min="1" max="12" value={f.chapters} onChange={e=>setF({...f,chapters:e.target.value})} title="Capítulos"/>
       <input className="inp" placeholder="Autor" value={f.author} onChange={e=>setF({...f,author:e.target.value})}/>
       <button className="btn md:col-span-4" disabled={load}>{load?"Gerando...":"Gerar e-book"}</button></form>
     {err&&<p className="text-red-400">{err}</p>}
-    {b&&<div><div className="flex flex-wrap gap-2 mb-4">
+    {b&&<div><div className="flex flex-wrap gap-3 mb-6">
         <button className="btn" onClick={pdf}>Baixar PDF</button>
         <button className="btn" onClick={()=>dl(URL.createObjectURL(new Blob([md()],{type:"text/markdown"})),slug()+".md")}>Baixar Markdown</button>
         <button className="btn" onClick={()=>dl(front.current.toDataURL(),"capa.png")}>Capa PNG</button>
         <button className="btn" onClick={()=>dl(back.current.toDataURL(),"contracapa.png")}>Contracapa PNG</button></div>
-      <div className="flex gap-4 mb-6"><div><p className="text-sm mb-1">Capa</p><canvas ref={front} width={600} height={850} className="w-60 glow rounded"/></div><div><p className="text-sm mb-1">Contracapa</p><canvas ref={back} width={600} height={850} className="w-60 glow rounded"/></div></div>
+      <div className="flex flex-wrap gap-6 mb-8"><div><p className="text-sm mb-1">Capa</p><canvas ref={front} width={600} height={850} className="w-60 glow rounded"/></div><div><p className="text-sm mb-1">Contracapa</p><canvas ref={back} width={600} height={850} className="w-60 glow rounded"/></div></div>
       <h3 className="text-2xl font-bold">{b.title}</h3><p className="text-sky-300 mb-3">{b.subtitle}</p>
       <h4 className="font-bold">Sumário</h4><ol className="list-decimal ml-6 mb-4">{b.outline.map(o=><li key={o}>{o}</li>)}</ol>
-      {b.chapters.map(c=><section key={c.title} className="mb-4"><h4 className="font-bold text-jarvis-300">{c.title}</h4><p className="whitespace-pre-wrap text-sky-100/90">{c.content}</p></section>)}</div>}
+      {b.chapters.map(c=><section key={c.title} className="mb-6"><h4 className="font-bold text-jarvis-300">{c.title}</h4><p className="whitespace-pre-wrap text-sky-100/90">{c.content}</p></section>)}</div>}
   </div>}
